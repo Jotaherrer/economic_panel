@@ -3,7 +3,7 @@ import pandas as pd
 from pandas.tseries.offsets import Day, MonthEnd
 import datetime as dt
 import plotly.express as px
-
+import matplotlib.pyplot as plt
 
 # Create functions
 
@@ -88,3 +88,17 @@ if __name__ == '__main__':
     fig.show()
 
     # Plot side-by-side bar chart
+    x_values1 = [2 * element + 0.8*1 for element in range(9)]
+    x_values2 = [2 * element + 0.8*2 for element in range(9)]
+    x_values3 = [2 * element + 0.8*3 for element in range(9)]
+    y_values1 = data[0]['2018'][:9]
+    y_values2 = data[0]['2019'][:9]
+    y_values3 = data[0]['2020'][:9]
+
+    fig,ax = plt.subplots(figsize=(20,10))
+    plt.bar(x_values1, y_values1, color='yellowgreen',edgecolor='red')
+    plt.bar(x_values2, y_values2, color='salmon', edgecolor='red')
+    plt.bar(x_values3, y_values3, color='peru', edgecolor='red')
+
+    plt.ylim((300000,1100000))
+    plt.show()
