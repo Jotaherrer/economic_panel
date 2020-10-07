@@ -6,7 +6,6 @@ import plotly.express as px
 import matplotlib.pyplot as plt
 
 # Create functions
-
 def create_url(date):
     """
     Creates a URL to download concrete sales stocks.
@@ -82,23 +81,40 @@ if __name__ == '__main__':
     html = read_webpage(url)
     data = prepare_data(html)
 
+    # Print
+    data[0]
+
     # Plot 2020
     fig = px.bar(data[0], x=data[1], y='2020', color = '2020',
-                 labels={'2020':'Mill. Ton.','x':'2020'}, height=500)
+                 labels={'2020':'Mill. Ton.','x':'2020'}, height=500, width=900)
     fig.show()
 
     # Plot side-by-side bar chart
-    x_values1 = [2 * element + 0.8*1 for element in range(9)]
-    x_values2 = [2 * element + 0.8*2 for element in range(9)]
-    x_values3 = [2 * element + 0.8*3 for element in range(9)]
+    x_values1 = [3 * element + 0.8*1 for element in range(9)]
+    x_values2 = [3 * element + 0.8*2 for element in range(9)]
+    x_values3 = [3 * element + 0.8*3 for element in range(9)]
     y_values1 = data[0]['2018'][:9]
     y_values2 = data[0]['2019'][:9]
     y_values3 = data[0]['2020'][:9]
 
-    fig,ax = plt.subplots(figsize=(20,10))
-    plt.bar(x_values1, y_values1, color='yellowgreen',edgecolor='red')
-    plt.bar(x_values2, y_values2, color='salmon', edgecolor='red')
-    plt.bar(x_values3, y_values3, color='peru', edgecolor='red')
+    fig,ax = plt.subplots(figsize=(16,10))
+    fig.patch.set_facecolor('lightgray')
 
-    plt.ylim((300000,1100000))
+    plt.bar(x_values1, y_values1, color='green',edgecolor='red')
+    plt.plot(x_values1, y_values1, color='yellowgreen',marker='*',linewidth='3')
+    plt.bar(x_values2, y_values2, color='salmon', edgecolor='red')
+    plt.plot(x_values2, y_values2, color='red',marker='*',linewidth='3')
+    plt.bar(x_values3, y_values3, color='peru', edgecolor='red')
+    plt.plot(x_values3, y_values3, color='orange',marker='*',linewidth='3')
+
+    ax.set_xticks(range(2,28,3))
+    ax.set_xticklabels(list(data[1][:9]), fontsize='15')
+    for tick in ax.get_xticklabels():
+        tick.set_rotation(-25)
+
+    plt.ylabel('Mill. Toneladas',fontsize='15')
+    plt.title('Comparativa Despachos de Cemento 2018/2019/2020', fontsize='15')
+    plt.legend(labels=['2018','2019','2020'], loc='best')
+    plt.ylim((350000,1200000))
+    plt.savefig('Comparativa Despachos')
     plt.show()
