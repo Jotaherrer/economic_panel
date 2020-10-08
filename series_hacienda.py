@@ -53,6 +53,7 @@ if __name__ == '__main__':
 
     # Nuevo Dataset
     series_ok = series_hacienda.iloc[43:]
+    series_ok = series_ok[series_ok['serie_actualizada'] == 'True']
     columns = series_hacienda.columns
     series_ok.info()
     series_ok.head()
@@ -75,7 +76,8 @@ if __name__ == '__main__':
     series_ok.sort_values('serie_indice_final', ascending=True)
     series_ok.describe()
 
-    series_nuevo = series_ok.loc[:,['serie_id','serie_titulo', 'serie_unidades','serie_indice_inicio','serie_indice_final','serie_actualizada', 'consultas_total']]
+    series_nuevo = series_ok.loc[:,['serie_id','serie_titulo', 'serie_unidades','serie_indice_inicio','serie_indice_final', 'consultas_total']]
+    series_nuevo.sort_values('serie_indice_final', ascending=True)
 
 
     # Filtro de series mas vistas y plotteo
