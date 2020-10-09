@@ -9,18 +9,21 @@ import matplotlib.pyplot as plt
 
 # Funciones
 
-def get_information(dataframe):
+def get_information(dataframe, level):
     """
     Returns a dataframe with information from the database. Params:
     - dataframe: input a pandas dataframe that contains a column named 'serie_titulo',
     that corresponds to the government's database format.
+    - level: index number to identify a series.
     """
     try:
-        data = dataframe['serie_id'].values[0]
+        data = dataframe['serie_id'].values[level]
         db_data = mh.get_data([data],limit=5000).reset_index()
+        db_data = db_data.set_index('index')
     except:
         db_data = 'Input an dataframe with the appropiate format'
     return db_data
+
 
 def get_most_viewed_series(amount, dataset):
     """
@@ -109,15 +112,60 @@ if __name__ == '__main__':
     emae = series_nuevo[series_nuevo['serie_titulo'].str.contains('emae')].sort_values('consultas_total',ascending=False)
     industria = series_nuevo[series_nuevo['serie_titulo'].str.contains('industria')].sort_values('consultas_total',ascending=False)
     cemento = series_nuevo[series_nuevo['serie_titulo'].str.contains('cemento')].sort_values('consultas_total',ascending=False)
+    construccion = series_nuevo[series_nuevo['serie_titulo'].str.contains('construccion')].sort_values('consultas_total',ascending=False)
     bienes_cap = series_nuevo[series_nuevo['serie_titulo'].str.contains('capital')].sort_values('consultas_total',ascending=False)
     supers = series_nuevo[series_nuevo['serie_descripcion'].str.contains('supermercados')].sort_values('consultas_total',ascending=False)
     patentamientos = series_nuevo[series_nuevo['serie_titulo'].str.contains('automotores')].sort_values('consultas_total',ascending=False)
     salario = series_nuevo[series_nuevo['serie_titulo'].str.contains('salario')].sort_values('consultas_total',ascending=False)
     empleo =  series_nuevo[series_nuevo['serie_descripcion'].str.contains('empleo')].sort_values('consultas_total',ascending=False)
     depositos = series_nuevo[series_nuevo['serie_descripcion'].str.contains('sector privado')].sort_values('consultas_total',ascending=False)
+    base_monetaria = series_nuevo[series_nuevo['serie_titulo'].str.contains('base_monetaria')].sort_values('consultas_total',ascending=False)
+    educacion = series_nuevo[series_nuevo['serie_titulo'].str.contains('educacion')].sort_values('consultas_total',ascending=False)
+    turismo = series_nuevo[series_nuevo['serie_titulo'].str.contains('turismo')].sort_values('consultas_total',ascending=False)
+    reservas = series_nuevo[series_nuevo['serie_titulo'].str.contains('reservas')].sort_values('consultas_total',ascending=False)
+    recaudacion = series_nuevo[series_nuevo['serie_titulo'].str.contains('recaudacion')].sort_values('consultas_total',ascending=False)
+    tcrm = series_nuevo[series_nuevo['serie_titulo'].str.contains('tipo_cambio_real_multilateral')].sort_values('consultas_total',ascending=False)
+    tcr_paises = series_nuevo[series_nuevo['serie_titulo'].str.contains('tipo_cambio_real_canada')].sort_values('consultas_total',ascending=False)
+    expos = series_nuevo[series_nuevo['serie_titulo'].str.contains('exportaciones')].sort_values('consultas_total',ascending=False)
+    impos = series_nuevo[series_nuevo['serie_titulo'].str.contains('importaciones')].sort_values('consultas_total',ascending=False)
+    def_prim = series_nuevo[series_nuevo['serie_titulo'].str.contains('resultado_primario')].sort_values('consultas_total',ascending=False)
+
 
     # Revision de una serie en particular
-    get_information(depositos)
+    get_information(recaudacion,0).loc['2015':'2020',:].plot()
+    get_information(base_monetaria,0).loc['2015':'2020',:].plot()
+    get_information(reservas,0).loc['2015':'2020',:].plot()
+    get_information(tc,0).loc['2010':'2020',:].plot()
+    get_information(expos,1).loc['2019':'2020',:].plot()
+    get_information(impos,0).loc['2019':'2020',:].plot(kind='bar')
+    get_information(def_prim,0).loc['2016':'2020',:].plot(kind='bar')
+
+    a = get_information(def_prim,0)
+    years = a.groupby(a.index.year).count().index
+
+    x = {}
+    for y in years:
+        x[y] = a.loc[str(y)]
+
+
+
+    def plot_time_series_bar(pandas_df):
+        """
+        Return simple bar plot to compare desired years
+        """
+        # Distribute data by years
+        years = pandas_df.groupby(pandas_df.index.year).count().index
+        data = pandas_df.T.squeeze()
+        # Plot side-by-side bar chart
+        x_values1 = [3 * element + 0.8*1 for element in range(9)]
+        x_values2 = [3 * element + 0.8*2 for element in range(9)]
+        x_values3 = [3 * element + 0.8*3 for element in range(9)]
+
+        fig, ax = plt.subplots(figsize=(14,10))
+
+        plt.plot(data, color='salmon',linewidth=2)
+        plt.title(data.columns.values)
+        plt.show()
 
 
     # Filtro de series mas vistas y plotteo
