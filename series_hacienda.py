@@ -11,10 +11,16 @@ import matplotlib.pyplot as plt
 
 def get_information(dataframe):
     """
+    Returns a dataframe with information from the database. Params:
+    - dataframe: input a pandas dataframe that contains a column named 'serie_titulo',
+    that corresponds to the government's database format.
     """
-    data = dataframe['serie_id'].values[0]
-    return mh.get_data([data],limit=5000)
-
+    try:
+        data = dataframe['serie_id'].values[0]
+        db_data = mh.get_data([data],limit=5000).reset_index()
+    except:
+        db_data = 'Input an dataframe with the appropiate format'
+    return db_data
 
 def get_most_viewed_series(amount, dataset):
     """
@@ -109,6 +115,8 @@ if __name__ == '__main__':
     salario = series_nuevo[series_nuevo['serie_titulo'].str.contains('salario')].sort_values('consultas_total',ascending=False)
     empleo =  series_nuevo[series_nuevo['serie_descripcion'].str.contains('empleo')].sort_values('consultas_total',ascending=False)
     depositos = series_nuevo[series_nuevo['serie_descripcion'].str.contains('sector privado')].sort_values('consultas_total',ascending=False)
+
+    # Revision de una serie en particular
     get_information(depositos)
 
 
