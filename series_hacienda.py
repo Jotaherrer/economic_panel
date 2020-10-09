@@ -9,6 +9,13 @@ import matplotlib.pyplot as plt
 
 # Funciones
 
+def get_information(dataframe):
+    """
+    """
+    data = dataframe['serie_id'].values[0]
+    return mh.get_data([data],limit=5000)
+
+
 def get_most_viewed_series(amount, dataset):
     """
     Returns most consulted series in the database
@@ -27,7 +34,11 @@ def plot_time_series(pandas_dataframe):
     """
     Return simple line plot to visualize trends
     """
-    data = pandas_dataframe
+    data = pandas_dataframe.T.squeeze()
+    # Plot side-by-side bar chart
+    x_values1 = [3 * element + 0.8*1 for element in range(9)]
+    x_values2 = [3 * element + 0.8*2 for element in range(9)]
+    x_values3 = [3 * element + 0.8*3 for element in range(9)]
 
     fig, ax = plt.subplots(figsize=(14,10))
 
@@ -77,7 +88,6 @@ if __name__ == '__main__':
     series_ok.serie_unidades.unique()
     series_ok.distribucion_url_descarga.unique()
 
-
     # Explore dataset
     series_id = series_ok['serie_id']
     series_titulos = series_ok['serie_titulo']
@@ -91,9 +101,15 @@ if __name__ == '__main__':
     # Filtro por conceptos especificos
     ipc = series_nuevo[series_nuevo['serie_titulo'].str.contains('ipc')].sort_values('consultas_total',ascending=False)
     emae = series_nuevo[series_nuevo['serie_titulo'].str.contains('emae')].sort_values('consultas_total',ascending=False)
-    hotel = series_nuevo[series_nuevo['serie_titulo'].str.contains('alojamiento')].sort_values('consultas_total',ascending=False)
-
-
+    industria = series_nuevo[series_nuevo['serie_titulo'].str.contains('industria')].sort_values('consultas_total',ascending=False)
+    cemento = series_nuevo[series_nuevo['serie_titulo'].str.contains('cemento')].sort_values('consultas_total',ascending=False)
+    bienes_cap = series_nuevo[series_nuevo['serie_titulo'].str.contains('capital')].sort_values('consultas_total',ascending=False)
+    supers = series_nuevo[series_nuevo['serie_descripcion'].str.contains('supermercados')].sort_values('consultas_total',ascending=False)
+    patentamientos = series_nuevo[series_nuevo['serie_titulo'].str.contains('automotores')].sort_values('consultas_total',ascending=False)
+    salario = series_nuevo[series_nuevo['serie_titulo'].str.contains('salario')].sort_values('consultas_total',ascending=False)
+    empleo =  series_nuevo[series_nuevo['serie_descripcion'].str.contains('empleo')].sort_values('consultas_total',ascending=False)
+    depositos = series_nuevo[series_nuevo['serie_descripcion'].str.contains('sector privado')].sort_values('consultas_total',ascending=False)
+    get_information(depositos)
 
 
     # Filtro de series mas vistas y plotteo
