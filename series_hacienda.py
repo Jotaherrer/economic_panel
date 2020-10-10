@@ -140,12 +140,32 @@ if __name__ == '__main__':
     get_information(impos,0).loc['2019':'2020',:].plot(kind='bar')
     get_information(def_prim,0).loc['2016':'2020',:].plot(kind='bar')
 
+
+    # Testing plotting function
     a = get_information(def_prim,0)
     years = a.groupby(a.index.year).count().index
+    b = get_information(cemento,0).loc['2016':'2020',:]
+    years2 = b.groupby(b.index.year).count().index
 
     x = {}
-    for y in years:
-        x[y] = a.loc[str(y)]
+    for y in years2:
+        x[y] = b.loc[str(y)]
+
+    x_vals = []
+    for i in range(1, len(x.keys())+1):
+        x_values_sample = [3 * element + 0.8*i for element in range(12)]
+        x_vals.append(x_values_sample)
+
+    y_vals = []
+    for y in x.keys():
+        y_values_sample = x[y].values
+        y_values_sample = y_values_sample.flatten('F')
+        y_vals.append(y_values_sample)
+
+    for i in range(len(x.keys())-1):
+        plt.bar(x_vals[i], y_vals[i],width=0.3)
+
+    plt.show()
 
 
 
@@ -155,17 +175,34 @@ if __name__ == '__main__':
         """
         # Distribute data by years
         years = pandas_df.groupby(pandas_df.index.year).count().index
-        data = pandas_df.T.squeeze()
-        # Plot side-by-side bar chart
-        x_values1 = [3 * element + 0.8*1 for element in range(9)]
-        x_values2 = [3 * element + 0.8*2 for element in range(9)]
-        x_values3 = [3 * element + 0.8*3 for element in range(9)]
+        data_dict = {}
+        for y in years:
+            data_dict[y] = pandas_df.loc[str(y)]
 
+        # Create X and Y values for bar plots
+        x_values = []
+        y_values = []
+        for i in range(1, len(data_dict.keys())+1):
+            x_values_sample = [len(years) * element + 0.8*i for element in range(12)]
+            x_values.append(x_values_sample)
+
+        for y in data_dict.keys():
+            y_values_sample = data_dict[y].values
+            y_values_sample = y_values_sample.flatten('F')
+            y_values.append(y_values_sample)
+
+
+        # Create Figure
         fig, ax = plt.subplots(figsize=(14,10))
 
-        plt.plot(data, color='salmon',linewidth=2)
-        plt.title(data.columns.values)
+        for i in range(len(years)-1):
+
+            plt.bar(x_values[i], y_values[i])
+
+        plt.legend(loc='best')
         plt.show()
+
+
 
 
     # Filtro de series mas vistas y plotteo
