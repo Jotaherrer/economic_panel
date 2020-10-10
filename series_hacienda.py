@@ -6,6 +6,7 @@ https://www.economia.gob.ar/datos/
 import os, pandas as pd
 import api_min_hac as mh
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Funciones
 
@@ -39,20 +40,53 @@ def get_most_viewed_ids(amount, dataset):
     return dataset.sort_values('consultas_total', ascending=False)[:amount]['serie_id'].values
 
 
-def plot_time_series(pandas_dataframe):
-    """
-    Return simple line plot to visualize trends
-    """
-    data = pandas_dataframe.T.squeeze()
-    # Plot side-by-side bar chart
-    x_values1 = [3 * element + 0.8*1 for element in range(9)]
-    x_values2 = [3 * element + 0.8*2 for element in range(9)]
-    x_values3 = [3 * element + 0.8*3 for element in range(9)]
 
-    fig, ax = plt.subplots(figsize=(14,10))
+def plot_comparative_bars(pandas_df):
+    """
+    Return simple bar plot to compare desired years
+    """
+    # Distribute data by years
+    years = pandas_df.groupby(pandas_df.index.year).count().index
+    months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio',
+              'Agosto','Septiembre','Octubre','Noviembre','Diciembre']
+    data_dict = {}
+    for y in years:
+        data_dict[y] = pandas_df.loc[str(y)]
 
-    plt.plot(data, color='salmon',linewidth=2)
-    plt.title(data.columns.values)
+    # Create X and Y values for bar plots
+    x_values = []
+    y_values = []
+    for i in range(1, len(data_dict.keys())+1):
+        x_values_sample = [len(years) * element + 0.8*i for element in range(12)]
+        x_values.append(x_values_sample)
+
+    for y in data_dict.keys():
+        y_values_sample = data_dict[y].values
+        y_values_sample = y_values_sample.flatten('F')
+        if y == 2020:
+            length = len(y_values_sample)
+            missings = 12 - length
+            y_values_sample = np.pad(y_values_sample,(0,missings),'constant')
+        y_values.append(y_values_sample)
+
+
+    # Create Figure
+    fig, ax = plt.subplots(figsize=(16,10))
+    color_bars = ['green','salmon','peru','steelblue','lime']
+    color_lines = ['yellowgreen','red','orange','blue','purple']
+    labels_range = np.arange(int(x_values[0][0])+2,int(x_values[-1][-1])+2,len(years))
+
+    for i in range(len(years)):
+        plt.bar(x_values[i], y_values[i], label=years.values[i],color=color_bars[i],edgecolor=color_lines[i])
+        plt.plot(x_values[i], y_values[i], color=color_lines[i],marker='*',linewidth='3')
+
+    ax.set_xticks(labels_range)
+    ax.set_xticklabels(months, fontsize='13')
+    for tick in ax.get_xticklabels():
+        tick.set_rotation(40)
+
+    plt.title(f'Comparativa valores últimos {len(years)} años de {pandas_df.columns.values[0]}',fontsize=15)
+    plt.legend(loc='best')
     plt.show()
 
 
@@ -105,7 +139,31 @@ if __name__ == '__main__':
     series_ok.sort_values('serie_indice_final', ascending=True)
     series_ok.describe()
 
+    # Filtro de series mas vistas y plotteo
+    most_viewed_titles = get_most_viewed_series(10, series_ok)
+    most_viewed_ids = get_most_viewed_ids(10, series_ok)
+
+    info = pd.DataFrame(mh.get_data([most_viewed_ids[0]],start_date=2015, limit=3000))
+    info2 = pd.DataFrame(mh.get_data([most_viewed_ids[1]],start_date=2015, limit=3000))
+
+    info_dic = {}
+
+    for code in most_viewed_ids:
+        info = pd.DataFrame(mh.get_data([code],start_date=2015, limit=3000))
+        info_dic[info.columns.values[0]] = info
+
+    info_dic.keys()
+    info_dic
+
+    plot_time_series(info_dic[most_viewed_titles[0]])
+
+    for i in range(len(most_viewed_titles)):
+        plot_time_series(info_dic[most_viewed_titles[i]])
+
+
+    # Create new df for selected columns
     series_nuevo = series_ok.loc[:,['serie_id','serie_titulo', 'serie_unidades','serie_descripcion','serie_indice_inicio','serie_indice_final', 'consultas_total']]
+
 
     # Filtro por conceptos especificos
     ipc = series_nuevo[series_nuevo['serie_titulo'].str.contains('ipc')].sort_values('consultas_total',ascending=False)
@@ -146,10 +204,12 @@ if __name__ == '__main__':
     years = a.groupby(a.index.year).count().index
     b = get_information(cemento,0).loc['2016':'2020',:]
     years2 = b.groupby(b.index.year).count().index
+    c = get_information(supers,0).loc['2016':'2020',:]
+    years3 = c.groupby(c.index.year).count().index
 
     x = {}
-    for y in years2:
-        x[y] = b.loc[str(y)]
+    for y in years3:
+        x[y] = c.loc[str(y)]
 
     x_vals = []
     for i in range(1, len(x.keys())+1):
@@ -160,13 +220,11 @@ if __name__ == '__main__':
     for y in x.keys():
         y_values_sample = x[y].values
         y_values_sample = y_values_sample.flatten('F')
+        if y == 2020:
+            length = len(y_values_sample)
+            missings = 12 - length
+            y_values_sample = np.pad(y_values_sample,(0,missings),'constant')
         y_vals.append(y_values_sample)
-
-    for i in range(len(x.keys())-1):
-        plt.bar(x_vals[i], y_vals[i],width=0.3)
-
-    plt.show()
-
 
 
     def plot_time_series_bar(pandas_df):
@@ -175,6 +233,8 @@ if __name__ == '__main__':
         """
         # Distribute data by years
         years = pandas_df.groupby(pandas_df.index.year).count().index
+        months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio',
+                  'Agosto','Septiembre','Octubre','Noviembre','Diciembre']
         data_dict = {}
         for y in years:
             data_dict[y] = pandas_df.loc[str(y)]
@@ -189,39 +249,32 @@ if __name__ == '__main__':
         for y in data_dict.keys():
             y_values_sample = data_dict[y].values
             y_values_sample = y_values_sample.flatten('F')
+            if y == 2020:
+                length = len(y_values_sample)
+                missings = 12 - length
+                y_values_sample = np.pad(y_values_sample,(0,missings),'constant')
             y_values.append(y_values_sample)
 
 
         # Create Figure
-        fig, ax = plt.subplots(figsize=(14,10))
+        fig, ax = plt.subplots(figsize=(16,10))
+        color_bars = ['green','salmon','peru','steelblue','lime']
+        color_lines = ['yellowgreen','red','orange','blue','purple']
+        labels_range = np.arange(int(x_values[0][0])+2,int(x_values[-1][-1])+2,len(years))
 
-        for i in range(len(years)-1):
+        for i in range(len(years)):
+            plt.bar(x_values[i], y_values[i], label=years.values[i],color=color_bars[i],edgecolor=color_lines[i])
+            plt.plot(x_values[i], y_values[i], color=color_lines[i],marker='*',linewidth='3')
 
-            plt.bar(x_values[i], y_values[i])
+        ax.set_xticks(labels_range)
+        ax.set_xticklabels(months, fontsize='13')
+        for tick in ax.get_xticklabels():
+            tick.set_rotation(40)
 
+        plt.title(f'Comparativa valores últimos {len(years)} años de {pandas_df.columns.values[0]}',fontsize=15)
         plt.legend(loc='best')
         plt.show()
 
 
 
 
-    # Filtro de series mas vistas y plotteo
-    most_viewed_titles = get_most_viewed_series(10, series_ok)
-    most_viewed_ids = get_most_viewed_ids(10, series_ok)
-
-    info = pd.DataFrame(mh.get_data([most_viewed_ids[0]],start_date=2015, limit=3000))
-    info2 = pd.DataFrame(mh.get_data([most_viewed_ids[1]],start_date=2015, limit=3000))
-
-    info_dic = {}
-
-    for code in most_viewed_ids:
-        info = pd.DataFrame(mh.get_data([code],start_date=2015, limit=3000))
-        info_dic[info.columns.values[0]] = info
-
-    info_dic.keys()
-    info_dic
-
-    plot_time_series(info_dic[most_viewed_titles[0]])
-
-    for i in range(len(most_viewed_titles)):
-        plot_time_series(info_dic[most_viewed_titles[i]])
