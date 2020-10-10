@@ -40,10 +40,9 @@ def get_most_viewed_ids(amount, dataset):
     return dataset.sort_values('consultas_total', ascending=False)[:amount]['serie_id'].values
 
 
-
 def plot_comparative_bars(pandas_df):
     """
-    Return simple bar plot to compare desired years
+    Returns a comparative bar chart with an output of desired years
     """
     # Distribute data by years
     years = pandas_df.groupby(pandas_df.index.year).count().index
@@ -69,23 +68,29 @@ def plot_comparative_bars(pandas_df):
             y_values_sample = np.pad(y_values_sample,(0,missings),'constant')
         y_values.append(y_values_sample)
 
-
     # Create Figure
     fig, ax = plt.subplots(figsize=(16,10))
     color_bars = ['green','salmon','peru','steelblue','lime']
+    #color_bars = 0.1
+    bar_width = 0.8
     color_lines = ['yellowgreen','red','orange','blue','purple']
     labels_range = np.arange(int(x_values[0][0])+2,int(x_values[-1][-1])+2,len(years))
 
     for i in range(len(years)):
-        plt.bar(x_values[i], y_values[i], label=years.values[i],color=color_bars[i],edgecolor=color_lines[i])
-        plt.plot(x_values[i], y_values[i], color=color_lines[i],marker='*',linewidth='3')
+        #rgba_color = color_bars + (i) * 0.4
+        #rgba_color = (0.3,rgba_color,0.4,0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2, 2.2)
 
+        plt.bar(x_values[i], y_values[i], width=bar_width, label=years.values[i],color=color_bars[i],edgecolor='purple')
+        plt.plot(x_values[i], y_values[i], color=color_lines[i],marker='s',markersize='10',linewidth='3')
+
+    # Setting ticks, labels and preview
     ax.set_xticks(labels_range)
     ax.set_xticklabels(months, fontsize='13')
     for tick in ax.get_xticklabels():
         tick.set_rotation(40)
-
     plt.title(f'Comparativa valores últimos {len(years)} años de {pandas_df.columns.values[0]}',fontsize=15)
+    plt.subplots_adjust(bottom= 0.2, top = 0.98)
+    plt.xlabel('Mes')
     plt.legend(loc='best')
     plt.show()
 
@@ -225,6 +230,10 @@ if __name__ == '__main__':
             missings = 12 - length
             y_values_sample = np.pad(y_values_sample,(0,missings),'constant')
         y_vals.append(y_values_sample)
+
+    # Testing Bar Plots
+    plot_comparative_bars(c)
+    plot_comparative_bars(b)
 
 
     def plot_time_series_bar(pandas_df):
