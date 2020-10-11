@@ -82,8 +82,8 @@ def plot_comparative_bars(pandas_df):
 
     # Plot bars in for loop
     for i in range(len(years)):
-        rgba_color = color_bars + i * 0.2
-        rgba_color = (0.2,rgba_color+0.1,rgba_color,1)
+        #rgba_color = color_bars + i * 0.2
+        #rgba_color = (0.2,rgba_color+0.1,rgba_color,1)
 
         plt.bar(x_values[i], y_values[i], width=bar_width, color=colors[i], label=years.values[i], edgecolor='purple')
         if len(y_values[i]) == len(set(y_values[i])):
@@ -116,6 +116,76 @@ def plot_comparative_bars(pandas_df):
     plt.xlabel('Mes',fontsize='13')
     plt.ylim((min,max))
     plt.legend(loc='best')
+    plt.show()
+
+
+def plot_comparative_lines(pandas_df):
+    """
+    Returns a comparative line plot with an output of desired years.
+    """
+    # Distribute data by years
+    years = pandas_df.groupby(pandas_df.index.year).count().index
+    months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio',
+              'Agosto','Septiembre','Octubre','Noviembre','Diciembre']
+    data_dict = {}
+    for y in years:
+        data_dict[y] = pandas_df.loc[str(y)]
+
+    # Create X and Y values for bar plots
+    x_values = []
+    y_values = []
+    for i in range(1, len(data_dict.keys())+1):
+        x_values_sample = [len(years) * element + 0.8*i for element in range(12)]
+        x_values.append(x_values_sample)
+
+    for y in data_dict.keys():
+        y_values_sample = data_dict[y].values
+        y_values_sample = y_values_sample.flatten('F')
+        if y == 2020:
+            length = len(y_values_sample)
+            missings = 12 - length
+            y_values_sample = np.pad(y_values_sample,(0,missings),'constant')
+        y_values.append(y_values_sample)
+
+    # Create Figure
+    fig, ax = plt.subplots(figsize=(18,10))
+    ax.set_facecolor((0.0, 0.8, 0.8))
+    color_lines = ['steelblue', 'green','peru','salmon','gray']
+    labels_range = np.arange(int(x_values[0][0])+2,int(x_values[-1][-1])+2,len(years))
+
+    # Plot lines in for loop
+    for i in range(len(years)):
+        if len(y_values[i]) == len(set(y_values[i])):
+            plt.plot(x_values[i], y_values[i], color=color_lines[i],marker='s',markersize='10',linewidth='3', label=years.values[i])
+        else:
+            y_values_line = y_values[i][y_values[i] != 0]
+            x_values_line = x_values[i][:len(y_values_line)]
+            plt.plot(x_values_line, y_values_line, color=color_lines[i],marker='s',markersize='10',linewidth='3', label=years.values[i])
+
+    # Setting "x" ticks
+    ax.set_xticks(labels_range)
+    ax.set_xticklabels(months, fontsize='13')
+    for tick in ax.get_xticklabels():
+        tick.set_rotation(40)
+    # Setting "y" ticks
+    numbers = []
+    for e in y_values:
+        for n in e:
+            numbers.append(n)
+    non_zeros = [x for x in numbers if x != 0]
+    min, max = (0.90 * np.min(non_zeros)), (1.1 * np.max(non_zeros))
+    y_ticks = np.linspace(round(min,0),round(max,0),10)
+    y_ticks = [round(n, 1) for n in y_ticks]
+    ax.set_yticks(y_ticks)
+    ax.set_yticklabels(y_ticks, fontsize='13')
+
+    # Setting labels and preview
+    plt.title(f'Comparativa de valores correspondientes a los últimos {len(years)} años de {pandas_df.columns.values[0]}',fontsize=15)
+    plt.subplots_adjust(bottom= 0.2, top = 0.98)
+    plt.xlabel('Mes',fontsize='13')
+    plt.ylim((min,max))
+    plt.legend(loc='best')
+    plt.grid()
     plt.show()
 
 
@@ -238,9 +308,6 @@ if __name__ == '__main__':
     tcrm = series_nuevo[series_nuevo['serie_titulo'].str.contains('tipo_cambio_real_multilateral')].sort_values('consultas_total',ascending=False)
     tcr_paises = series_nuevo[series_nuevo['serie_titulo'].str.contains('tipo_cambio_real_canada')].sort_values('consultas_total',ascending=False)
 
-    # Revision de una serie en particular
-    get_information(turismo,0).loc['2017':'2020',:]
-
 
     ## Testing get_information function
     # Stocks
@@ -260,7 +327,7 @@ if __name__ == '__main__':
     turismo_emisivo_to_plot = get_information(turismo,18).loc['2016':'2020']
 
     # Flujos
-    ipc_nacional, ipc_nucleo = get_information(ipc,4), get_information(ipc, 7)
+    ipc_nacional, ipc_nucleo = get_information(ipc,4).loc['2017':'2020',:], get_information(ipc, 7).loc['2017':'2020',:]
     tcrm_plot = get_information(tcrm, 0)
 
 
