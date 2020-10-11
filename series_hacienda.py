@@ -19,8 +19,11 @@ def get_information(dataframe, level):
     """
     try:
         data = dataframe['serie_id'].values[level]
+        unidades = dataframe['serie_unidades'].values[level]
         db_data = mh.get_data([data],limit=5000).reset_index()
         db_data = db_data.set_index('index')
+        col_name = db_data.columns.values[0]
+        db_data.rename(columns={col_name:str(col_name+' - Unidad:'+unidades)},inplace=True)
     except:
         db_data = 'Input an dataframe with the appropiate format'
     return db_data
@@ -42,7 +45,7 @@ def get_most_viewed_ids(amount, dataset):
 
 def plot_comparative_bars(pandas_df):
     """
-    Returns a comparative bar chart with an output of desired years
+    Returns a comparative bar chart with an output of desired years. Computes up to 5 years.
     """
     # Distribute data by years
     years = pandas_df.groupby(pandas_df.index.year).count().index
@@ -70,27 +73,40 @@ def plot_comparative_bars(pandas_df):
 
     # Create Figure
     fig, ax = plt.subplots(figsize=(16,10))
-    color_bars = ['green','salmon','peru','steelblue','lime']
-    #color_bars = 0.1
-    bar_width = 0.8
-    color_lines = ['yellowgreen','red','orange','blue','purple']
+    color_bars, bar_width = 0.1, 0.8
+    colors = ['steelblue', 'green','peru','salmon','yellow']
+    color_lines = ['blue','yellowgreen','orange','red','yellow']
+    #color_lines = [(0,0.2,0.3,1),(0,0.2,0.3,0.8),(0,0.2,0.3,0.6),(0.,0.2,0.3,0.4),(0,0.2,0.3,0.2)] # Gradient of reds
     labels_range = np.arange(int(x_values[0][0])+2,int(x_values[-1][-1])+2,len(years))
 
+    # Plot bars in for loop
     for i in range(len(years)):
-        #rgba_color = color_bars + (i) * 0.4
-        #rgba_color = (0.3,rgba_color,0.4,0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2, 2.2)
+        rgba_color = color_bars + i * 0.2
+        rgba_color = (0.2,rgba_color+0.1,rgba_color,1)
 
-        plt.bar(x_values[i], y_values[i], width=bar_width, label=years.values[i],color=color_bars[i],edgecolor='purple')
-        plt.plot(x_values[i], y_values[i], color=color_lines[i],marker='s',markersize='10',linewidth='3')
+        plt.bar(x_values[i], y_values[i], width=bar_width, color=colors[i], label=years.values[i], edgecolor='purple')
+        plt.plot(x_values[i], y_values[i], color=color_lines[i],marker='s',markersize='10',linewidth='3', label=years.values[i])
 
-    # Setting ticks, labels and preview
+    # Setting "x" ticks
     ax.set_xticks(labels_range)
     ax.set_xticklabels(months, fontsize='13')
     for tick in ax.get_xticklabels():
         tick.set_rotation(40)
-    plt.title(f'Comparativa valores últimos {len(years)} años de {pandas_df.columns.values[0]}',fontsize=15)
+    # Setting "y" ticks
+    numbers = []
+    for e in y_values:
+        for n in e:
+            numbers.append(n)
+    non_zeros = [x for x in numbers if x != 0]
+    min, max = (0.90 * np.min(non_zeros)), (1.1 * np.max(non_zeros))
+    y_ticks = np.linspace(round(min,0),round(max,0),10)
+    ax.set_yticks(y_ticks)
+
+    # Setting labels and preview
+    plt.title(f'Comparativa de valores correspondientes a los últimos {len(years)} años de {pandas_df.columns.values[0]}',fontsize=15)
     plt.subplots_adjust(bottom= 0.2, top = 0.98)
     plt.xlabel('Mes')
+    plt.ylim((min,max))
     plt.legend(loc='best')
     plt.show()
 
@@ -113,7 +129,6 @@ if __name__ == '__main__':
     # Nuevo Dataset con filtro de serie actualizada
     series_ok = series_hacienda.iloc[43:]
     series_ok = series_ok[series_ok['serie_actualizada'] == 'True']
-    columns = series_hacienda.columns
     series_ok.info()
     series_ok.head()
 
@@ -139,17 +154,10 @@ if __name__ == '__main__':
     # Explore dataset
     series_id = series_ok['serie_id']
     series_titulos = series_ok['serie_titulo']
-    test = mh.get_data(['92.1_RID_0_0_32'], start_date='2015-01')
-
-    series_ok.sort_values('serie_indice_final', ascending=True)
-    series_ok.describe()
 
     # Filtro de series mas vistas y plotteo
     most_viewed_titles = get_most_viewed_series(10, series_ok)
     most_viewed_ids = get_most_viewed_ids(10, series_ok)
-
-    info = pd.DataFrame(mh.get_data([most_viewed_ids[0]],start_date=2015, limit=3000))
-    info2 = pd.DataFrame(mh.get_data([most_viewed_ids[1]],start_date=2015, limit=3000))
 
     info_dic = {}
 
@@ -206,11 +214,8 @@ if __name__ == '__main__':
 
     # Testing plotting function
     a = get_information(def_prim,0)
-    years = a.groupby(a.index.year).count().index
-    b = get_information(cemento,0).loc['2016':'2020',:]
-    years2 = b.groupby(b.index.year).count().index
+    b = get_information(cemento,0).loc['2017':'2020',:]
     c = get_information(supers,0).loc['2016':'2020',:]
-    years3 = c.groupby(c.index.year).count().index
 
     x = {}
     for y in years3:
@@ -233,9 +238,29 @@ if __name__ == '__main__':
 
     # Testing Bar Plots
     plot_comparative_bars(c)
+    plot_comparative_bars(a)
     plot_comparative_bars(b)
 
+    # Testing RGBA colors
+    plt.bar([1,2,3,4], [1,2,3,4], color=(1,0.7,0.7,0.5))
+    plt.bar([5,6,7,8], [1,2,3,4], color=(0,0.2,0.2,0.5))
+    plt.bar([9,10,11,12], [1,2,3,4], color=(1,0.2,0.2,0.5))
+    plt.bar([13,14,15,16], [1,2,3,4], color=(0,0.7,0.7,0.5))
+    plt.show()
 
+    plt.bar([1,2,3,4], [1,2,3,4], color=(1,0.1,0.5,0.5))
+    plt.bar([5,6,7,8], [1,2,3,4], color=(1,0.3,0.5,0.5))
+    plt.bar([9,10,11,12], [1,2,3,4], color=(1,0.5,0.5,0.5))
+    plt.bar([13,14,15,16], [1,2,3,4], color=(1,0.7,0.5,0.5))
+    plt.show()
+
+    plt.bar([1,2,3,4], [1,2,3,4],     color=(0,0.1,0.3,1))
+    plt.bar([5,6,7,8], [1,2,3,4],     color=(0,0.3,0.5,1))
+    plt.bar([9,10,11,12], [1,2,3,4],  color=(0,0.5,0.7,1))
+    plt.bar([13,14,15,16], [1,2,3,4], color=(0,0.7,0.9,1))
+    plt.show()
+
+    # Creating plot formulas
     def plot_time_series_bar(pandas_df):
         """
         Return simple bar plot to compare desired years
