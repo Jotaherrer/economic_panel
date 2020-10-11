@@ -7,6 +7,7 @@ import os, pandas as pd
 import api_min_hac as mh
 import matplotlib.pyplot as plt
 import numpy as np
+import datetime as dt
 
 # Funciones
 
@@ -72,10 +73,10 @@ def plot_comparative_bars(pandas_df):
         y_values.append(y_values_sample)
 
     # Create Figure
-    fig, ax = plt.subplots(figsize=(16,10))
+    fig, ax = plt.subplots(figsize=(18,10))
     color_bars, bar_width = 0.1, 0.8
-    colors = ['steelblue', 'green','peru','salmon','yellow']
-    color_lines = ['blue','yellowgreen','orange','red','yellow']
+    colors = ['steelblue', 'green','peru','salmon','gray']
+    color_lines = ['blue','yellowgreen','orange','red','black']
     #color_lines = [(0,0.2,0.3,1),(0,0.2,0.3,0.8),(0,0.2,0.3,0.6),(0.,0.2,0.3,0.4),(0,0.2,0.3,0.2)] # Gradient of reds
     labels_range = np.arange(int(x_values[0][0])+2,int(x_values[-1][-1])+2,len(years))
 
@@ -85,7 +86,12 @@ def plot_comparative_bars(pandas_df):
         rgba_color = (0.2,rgba_color+0.1,rgba_color,1)
 
         plt.bar(x_values[i], y_values[i], width=bar_width, color=colors[i], label=years.values[i], edgecolor='purple')
-        plt.plot(x_values[i], y_values[i], color=color_lines[i],marker='s',markersize='10',linewidth='3', label=years.values[i])
+        if len(y_values[i]) == len(set(y_values[i])):
+            plt.plot(x_values[i], y_values[i], color=color_lines[i],marker='s',markersize='10',linewidth='3', label=years.values[i])
+        else:
+            y_values_line = y_values[i][y_values[i] != 0]
+            x_values_line = x_values[i][:len(y_values_line)]
+            plt.plot(x_values_line, y_values_line, color=color_lines[i],marker='s',markersize='10',linewidth='3', label=years.values[i])
 
     # Setting "x" ticks
     ax.set_xticks(labels_range)
@@ -100,12 +106,14 @@ def plot_comparative_bars(pandas_df):
     non_zeros = [x for x in numbers if x != 0]
     min, max = (0.90 * np.min(non_zeros)), (1.1 * np.max(non_zeros))
     y_ticks = np.linspace(round(min,0),round(max,0),10)
+    y_ticks = [round(n, 1) for n in y_ticks]
     ax.set_yticks(y_ticks)
+    ax.set_yticklabels(y_ticks, fontsize='13')
 
     # Setting labels and preview
     plt.title(f'Comparativa de valores correspondientes a los últimos {len(years)} años de {pandas_df.columns.values[0]}',fontsize=15)
     plt.subplots_adjust(bottom= 0.2, top = 0.98)
-    plt.xlabel('Mes')
+    plt.xlabel('Mes',fontsize='13')
     plt.ylim((min,max))
     plt.legend(loc='best')
     plt.show()
@@ -168,8 +176,6 @@ if __name__ == '__main__':
     info_dic.keys()
     info_dic
 
-    plot_time_series(info_dic[most_viewed_titles[0]])
-
     for i in range(len(most_viewed_titles)):
         plot_time_series(info_dic[most_viewed_titles[i]])
 
@@ -178,68 +184,99 @@ if __name__ == '__main__':
     series_nuevo = series_ok.loc[:,['serie_id','serie_titulo', 'serie_unidades','serie_descripcion','serie_indice_inicio','serie_indice_final', 'consultas_total']]
 
 
-    # Filtro por conceptos especificos
+    # Aplicando filtros de mas recientes
+    recientes = series_nuevo.sort_values('serie_indice_final',ascending=False)
+    recientes['serie_indice_final'].values[0]
+    type(recientes['serie_indice_final'].values[0])
+
+    recientes['serie_indice_final'] = pd.to_datetime(recientes['serie_indice_final'])
+    recientes['serie_indice_final'].values[0]
+    type(recientes['serie_indice_final'].values[0])
+
+    recientes['serie_indice_final'] = recientes['serie_indice_final'].astype('datetime64[ns]')
+    recientes['serie_indice_final'].values[100]
+    type(recientes['serie_indice_final'].values[0])
+
+    d_old = []
+    d_new = []
+    for date in recientes['serie_indice_final'].values:
+        date_n = dt.datetime.strptime(date, '%Y-%m-%d')
+        d_old.append(date)
+        d_new.append(date_n)
+
+    recientes['new_date'] = d_new
+    recientes.set_index('new_date', inplace=True)
+    recientes[:5]
+    recientes.loc['2020-09', 'serie_id'].reset_index()
+    recientes.loc['2020-08', 'serie_id'].reset_index()
+    recientes.loc['2120', 'serie_id'].reset_index()
+
+
+    ## Filtro por conceptos especificos
+    # Variables stock
+    salario = series_nuevo[series_nuevo['serie_titulo'].str.contains('salario')].sort_values('consultas_total',ascending=False)
+    cemento = series_nuevo[series_nuevo['serie_titulo'].str.contains('cemento')].sort_values('consultas_total',ascending=False)
+    supers = series_nuevo[series_nuevo['serie_descripcion'].str.contains('supermercados')].sort_values('consultas_total',ascending=False)
+    depositos = series_nuevo[series_nuevo['serie_descripcion'].str.contains('sector privado')].sort_values('consultas_total',ascending=False)
+    base_monetaria = series_nuevo[series_nuevo['serie_titulo'].str.contains('base_monetaria')].sort_values('consultas_total',ascending=False)
+    expos = series_nuevo[series_nuevo['serie_titulo'].str.contains('exportaciones')].sort_values('consultas_total',ascending=False)
+    impos = series_nuevo[series_nuevo['serie_titulo'].str.contains('importaciones')].sort_values('consultas_total',ascending=False)
+    bienes_cap = series_nuevo[series_nuevo['serie_titulo'].str.contains('capital')].sort_values('consultas_total',ascending=False)
+    reservas = series_nuevo[series_nuevo['serie_titulo'].str.contains('reservas')].sort_values('consultas_total',ascending=False)
+    def_prim = series_nuevo[series_nuevo['serie_titulo'].str.contains('resultado_primario')].sort_values('consultas_total',ascending=False)
+    turismo = series_nuevo[series_nuevo['serie_titulo'].str.contains('turismo')].sort_values('consultas_total',ascending=False)
+
+    # Variables flujo
     ipc = series_nuevo[series_nuevo['serie_titulo'].str.contains('ipc')].sort_values('consultas_total',ascending=False)
     emae = series_nuevo[series_nuevo['serie_titulo'].str.contains('emae')].sort_values('consultas_total',ascending=False)
     industria = series_nuevo[series_nuevo['serie_titulo'].str.contains('industria')].sort_values('consultas_total',ascending=False)
-    cemento = series_nuevo[series_nuevo['serie_titulo'].str.contains('cemento')].sort_values('consultas_total',ascending=False)
     construccion = series_nuevo[series_nuevo['serie_titulo'].str.contains('construccion')].sort_values('consultas_total',ascending=False)
-    bienes_cap = series_nuevo[series_nuevo['serie_titulo'].str.contains('capital')].sort_values('consultas_total',ascending=False)
-    supers = series_nuevo[series_nuevo['serie_descripcion'].str.contains('supermercados')].sort_values('consultas_total',ascending=False)
-    patentamientos = series_nuevo[series_nuevo['serie_titulo'].str.contains('automotores')].sort_values('consultas_total',ascending=False)
-    salario = series_nuevo[series_nuevo['serie_titulo'].str.contains('salario')].sort_values('consultas_total',ascending=False)
-    empleo =  series_nuevo[series_nuevo['serie_descripcion'].str.contains('empleo')].sort_values('consultas_total',ascending=False)
-    depositos = series_nuevo[series_nuevo['serie_descripcion'].str.contains('sector privado')].sort_values('consultas_total',ascending=False)
-    base_monetaria = series_nuevo[series_nuevo['serie_titulo'].str.contains('base_monetaria')].sort_values('consultas_total',ascending=False)
     educacion = series_nuevo[series_nuevo['serie_titulo'].str.contains('educacion')].sort_values('consultas_total',ascending=False)
-    turismo = series_nuevo[series_nuevo['serie_titulo'].str.contains('turismo')].sort_values('consultas_total',ascending=False)
-    reservas = series_nuevo[series_nuevo['serie_titulo'].str.contains('reservas')].sort_values('consultas_total',ascending=False)
     recaudacion = series_nuevo[series_nuevo['serie_titulo'].str.contains('recaudacion')].sort_values('consultas_total',ascending=False)
+    patentamientos = series_nuevo[series_nuevo['serie_titulo'].str.contains('automotores')].sort_values('consultas_total',ascending=False)
+    empleo =  series_nuevo[series_nuevo['serie_descripcion'].str.contains('empleo')].sort_values('consultas_total',ascending=False)
     tcrm = series_nuevo[series_nuevo['serie_titulo'].str.contains('tipo_cambio_real_multilateral')].sort_values('consultas_total',ascending=False)
     tcr_paises = series_nuevo[series_nuevo['serie_titulo'].str.contains('tipo_cambio_real_canada')].sort_values('consultas_total',ascending=False)
-    expos = series_nuevo[series_nuevo['serie_titulo'].str.contains('exportaciones')].sort_values('consultas_total',ascending=False)
-    impos = series_nuevo[series_nuevo['serie_titulo'].str.contains('importaciones')].sort_values('consultas_total',ascending=False)
-    def_prim = series_nuevo[series_nuevo['serie_titulo'].str.contains('resultado_primario')].sort_values('consultas_total',ascending=False)
-
 
     # Revision de una serie en particular
-    get_information(recaudacion,0).loc['2015':'2020',:].plot()
-    get_information(base_monetaria,0).loc['2015':'2020',:].plot()
-    get_information(reservas,0).loc['2015':'2020',:].plot()
-    get_information(tc,0).loc['2010':'2020',:].plot()
-    get_information(expos,1).loc['2019':'2020',:].plot()
-    get_information(impos,0).loc['2019':'2020',:].plot(kind='bar')
-    get_information(def_prim,0).loc['2016':'2020',:].plot(kind='bar')
+    get_information(turismo,0).loc['2017':'2020',:]
 
 
-    # Testing plotting function
-    a = get_information(def_prim,0)
-    b = get_information(cemento,0).loc['2017':'2020',:]
-    c = get_information(supers,0).loc['2016':'2020',:]
+    ## Testing get_information function
+    # Stocks
+    salario_mvm_to_plot = get_information(salario,0).loc['2017':'2020',:]
+    cemento_to_plot = get_information(cemento,0).loc['2016':'2020',:]
+    supers_to_plot = get_information(supers,0).loc['2017':'2020',:]
+    depo_usd_to_plot = get_information(depositos,0).loc['2016':'2020']
+    depo_cc_plot = get_information(depositos,8).loc['2016':'2020']
+    depo_ca_plot = get_information(depositos,9).loc['2016':'2020']
+    base_monetaria_to_plot = get_information(base_monetaria, 0).loc['2016':'2020']
+    expos_total_to_plot = get_information(expos,1).loc['2016':'2020']
+    impos_total_to_plot = get_information(impos,0).loc['2016':'2020']
+    impos_bs_cap = get_information(bienes_cap, 1).loc['2016':'2020']
+    reservas_to_plot = get_information(reservas, 0).loc['2016':'2020']
+    deficit_to_plot = get_information(def_prim,0).loc['2016':'2020']
+    turismo_receptivo_to_plot = get_information(turismo,7).loc['2016':'2020']
+    turismo_emisivo_to_plot = get_information(turismo,18).loc['2016':'2020']
 
-    x = {}
-    for y in years3:
-        x[y] = c.loc[str(y)]
+    # Flujos
+    ipc_nacional, ipc_nucleo = get_information(ipc,4), get_information(ipc, 7)
+    tcrm_plot = get_information(tcrm, 0)
 
-    x_vals = []
-    for i in range(1, len(x.keys())+1):
-        x_values_sample = [3 * element + 0.8*i for element in range(12)]
-        x_vals.append(x_values_sample)
-
-    y_vals = []
-    for y in x.keys():
-        y_values_sample = x[y].values
-        y_values_sample = y_values_sample.flatten('F')
-        if y == 2020:
-            length = len(y_values_sample)
-            missings = 12 - length
-            y_values_sample = np.pad(y_values_sample,(0,missings),'constant')
-        y_vals.append(y_values_sample)
 
     # Testing Bar Plots
-    plot_comparative_bars(c)
-    plot_comparative_bars(a)
-    plot_comparative_bars(b)
+    plot_comparative_bars(salario_mvm_to_plot)
+    plot_comparative_bars(cemento_to_plot)
+    plot_comparative_bars(supers_to_plot)
+    plot_comparative_bars(depo_usd_to_plot)
+    plot_comparative_bars(depo_cc_plot)
+    plot_comparative_bars(depo_ca_plot)
+    plot_comparative_bars(base_monetaria_to_plot)
+    plot_comparative_bars(expos_total_to_plot)
+    plot_comparative_bars(impos_total_to_plot)
+    plot_comparative_bars(reservas_to_plot)
+    plot_comparative_bars(deficit_to_plot)
+
 
     # Testing RGBA colors
     plt.bar([1,2,3,4], [1,2,3,4], color=(1,0.7,0.7,0.5))
@@ -248,67 +285,10 @@ if __name__ == '__main__':
     plt.bar([13,14,15,16], [1,2,3,4], color=(0,0.7,0.7,0.5))
     plt.show()
 
-    plt.bar([1,2,3,4], [1,2,3,4], color=(1,0.1,0.5,0.5))
-    plt.bar([5,6,7,8], [1,2,3,4], color=(1,0.3,0.5,0.5))
-    plt.bar([9,10,11,12], [1,2,3,4], color=(1,0.5,0.5,0.5))
-    plt.bar([13,14,15,16], [1,2,3,4], color=(1,0.7,0.5,0.5))
-    plt.show()
-
     plt.bar([1,2,3,4], [1,2,3,4],     color=(0,0.1,0.3,1))
     plt.bar([5,6,7,8], [1,2,3,4],     color=(0,0.3,0.5,1))
     plt.bar([9,10,11,12], [1,2,3,4],  color=(0,0.5,0.7,1))
     plt.bar([13,14,15,16], [1,2,3,4], color=(0,0.7,0.9,1))
     plt.show()
-
-    # Creating plot formulas
-    def plot_time_series_bar(pandas_df):
-        """
-        Return simple bar plot to compare desired years
-        """
-        # Distribute data by years
-        years = pandas_df.groupby(pandas_df.index.year).count().index
-        months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio',
-                  'Agosto','Septiembre','Octubre','Noviembre','Diciembre']
-        data_dict = {}
-        for y in years:
-            data_dict[y] = pandas_df.loc[str(y)]
-
-        # Create X and Y values for bar plots
-        x_values = []
-        y_values = []
-        for i in range(1, len(data_dict.keys())+1):
-            x_values_sample = [len(years) * element + 0.8*i for element in range(12)]
-            x_values.append(x_values_sample)
-
-        for y in data_dict.keys():
-            y_values_sample = data_dict[y].values
-            y_values_sample = y_values_sample.flatten('F')
-            if y == 2020:
-                length = len(y_values_sample)
-                missings = 12 - length
-                y_values_sample = np.pad(y_values_sample,(0,missings),'constant')
-            y_values.append(y_values_sample)
-
-
-        # Create Figure
-        fig, ax = plt.subplots(figsize=(16,10))
-        color_bars = ['green','salmon','peru','steelblue','lime']
-        color_lines = ['yellowgreen','red','orange','blue','purple']
-        labels_range = np.arange(int(x_values[0][0])+2,int(x_values[-1][-1])+2,len(years))
-
-        for i in range(len(years)):
-            plt.bar(x_values[i], y_values[i], label=years.values[i],color=color_bars[i],edgecolor=color_lines[i])
-            plt.plot(x_values[i], y_values[i], color=color_lines[i],marker='*',linewidth='3')
-
-        ax.set_xticks(labels_range)
-        ax.set_xticklabels(months, fontsize='13')
-        for tick in ax.get_xticklabels():
-            tick.set_rotation(40)
-
-        plt.title(f'Comparativa valores últimos {len(years)} años de {pandas_df.columns.values[0]}',fontsize=15)
-        plt.legend(loc='best')
-        plt.show()
-
-
 
 
