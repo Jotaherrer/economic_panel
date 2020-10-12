@@ -148,9 +148,9 @@ def plot_comparative_lines(pandas_df):
         y_values.append(y_values_sample)
 
     # Create Figure
-    fig, ax = plt.subplots(figsize=(18,10))
-    ax.set_facecolor((0.0, 0.8, 0.8))
-    color_lines = ['steelblue', 'green','peru','salmon','gray']
+    fig, ax = plt.subplots(figsize=(14,8))
+    ax.set_facecolor((0.7,0.8,0.8,0.9))
+    color_lines = ['steelblue', 'green','peru','salmon','gray', 'yellow', 'yellowgreen', 'lime', '']
     labels_range = np.arange(int(x_values[0][0])+2,int(x_values[-1][-1])+2,len(years))
 
     # Plot lines in for loop
@@ -237,19 +237,6 @@ if __name__ == '__main__':
     most_viewed_titles = get_most_viewed_series(10, series_ok)
     most_viewed_ids = get_most_viewed_ids(10, series_ok)
 
-    info_dic = {}
-
-    for code in most_viewed_ids:
-        info = pd.DataFrame(mh.get_data([code],start_date=2015, limit=3000))
-        info_dic[info.columns.values[0]] = info
-
-    info_dic.keys()
-    info_dic
-
-    for i in range(len(most_viewed_titles)):
-        plot_time_series(info_dic[most_viewed_titles[i]])
-
-
     # Create new df for selected columns
     series_nuevo = series_ok.loc[:,['serie_id','serie_titulo', 'serie_unidades','serie_descripcion','serie_indice_inicio','serie_indice_final', 'consultas_total']]
 
@@ -328,10 +315,11 @@ if __name__ == '__main__':
 
     # Flujos
     ipc_nacional, ipc_nucleo = get_information(ipc,4).loc['2017':'2020',:], get_information(ipc, 7).loc['2017':'2020',:]
-    tcrm_plot = get_information(tcrm, 0)
+    tcrm_plot = get_information(tcrm, 0).loc['2017':'2020',:]
 
 
-    # Testing Bar Plots
+    ## Testing Bar Plots
+    # Stocks
     plot_comparative_bars(salario_mvm_to_plot)
     plot_comparative_bars(cemento_to_plot)
     plot_comparative_bars(supers_to_plot)
@@ -343,10 +331,19 @@ if __name__ == '__main__':
     plot_comparative_bars(impos_total_to_plot)
     plot_comparative_bars(reservas_to_plot)
     plot_comparative_bars(deficit_to_plot)
+    # Flujo
+    plot_comparative_lines(ipc_nacional)
+    plot_comparative_lines(tcrm_plot)
 
 
     # Testing RGBA colors
     plt.bar([1,2,3,4], [1,2,3,4], color=(1,0.7,0.7,0.5))
+    plt.bar([5,6,7,8], [1,2,3,4], color=(0,0.2,0.2,0.5))
+    plt.bar([9,10,11,12], [1,2,3,4], color=(1,0.2,0.2,0.5))
+    plt.bar([13,14,15,16], [1,2,3,4], color=(0,0.7,0.7,0.5))
+    plt.show()
+
+    plt.bar([1,2,3,4], [1,2,3,4], color=(0.7,0.8,0.8,0.9))
     plt.bar([5,6,7,8], [1,2,3,4], color=(0,0.2,0.2,0.5))
     plt.bar([9,10,11,12], [1,2,3,4], color=(1,0.2,0.2,0.5))
     plt.bar([13,14,15,16], [1,2,3,4], color=(0,0.7,0.7,0.5))
@@ -357,5 +354,3 @@ if __name__ == '__main__':
     plt.bar([9,10,11,12], [1,2,3,4],  color=(0,0.5,0.7,1))
     plt.bar([13,14,15,16], [1,2,3,4], color=(0,0.7,0.9,1))
     plt.show()
-
-
