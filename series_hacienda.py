@@ -8,6 +8,7 @@ import api_min_hac as mh
 import matplotlib.pyplot as plt
 import numpy as np
 import datetime as dt
+from matplotlib.dates import DateFormatter
 
 # Funciones
 
@@ -119,56 +120,35 @@ def plot_comparative_bars(pandas_df):
     plt.show()
 
 
-def plot_comparative_lines(pandas_df):
-    """
-    Returns a comparative line plot with an output of desired years.
-    """
-    # Distribute data by years
+def line_plot(pandas_df):
+    # Display years
     years = pandas_df.groupby(pandas_df.index.year).count().index
     months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio',
               'Agosto','Septiembre','Octubre','Noviembre','Diciembre']
-
     # Create x and y dataframe values
-    x_values = months * len(years)
-    y_values_sample = pandas_df.values.flatten("F")
+    x_values_sample = list(range(len(months*4)))
+    y_values = pandas_df.values.flatten("F")
+    # Filter x values to y values length
+    if len(y_values) != len(x_values_sample):
+        length_sample = len(x_values_sample)
+        missings = length_sample - len(y_values)
+        x_values = x_values_sample[:-missings]
 
-    if len(y_values_sample) != len(x_values):
-        length = len(x_values)
-        missings = length - len(y_values_sample)
-        y_values = np.pad(y_values_sample,(0,missings),'constant')
-
-    # Create Figure
-    fig, ax = plt.subplots(figsize=(14,8))
+    # Create figure
+    fig,ax = plt.subplots(figsize=(14,10))
     ax.set_facecolor((0.7,0.8,0.8,0.9))
-    line_color = ['steelblue']
+    plt.plot(pandas_df.index.values, y_values, color='peru', linewidth='4')
+    # Set labels, title and axes
 
-    # Plot lines in for loop
-    plt.plot(x_values, y_values, color=line_color,marker='s',markersize='10',linewidth='3')
+    #ax.set_xticks(np.arange(len((pandas_df.index.values))))
+    #ax.set_xticklabels(pandas_df.index.values, rotation=40)
+    date_form = DateFormatter('%d-%m-%Y')
+    ax.xaxis.set_major_formatter(date_form)
 
-    # Setting "x" ticks
-    labels_range = np.arange(1,len(x_values),4)
-    ax.set_xticks(labels_range)
-    ax.set_xticklabels(months, fontsize='13')
-    for tick in ax.get_xticklabels():
-        tick.set_rotation(40)
-    # Setting "y" ticks
-    numbers = []
-    for e in y_values:
-        for n in e:
-            numbers.append(n)
-    non_zeros = [x for x in numbers if x != 0]
-    min, max = (0.90 * np.min(non_zeros)), (1.1 * np.max(non_zeros))
-    y_ticks = np.linspace(round(min,0),round(max,0),10)
-    y_ticks = [round(n, 1) for n in y_ticks]
-    ax.set_yticks(y_ticks)
-    ax.set_yticklabels(y_ticks, fontsize='13')
-
-    # Setting labels and preview
-    plt.title(f'Comparativa de valores correspondientes a los últimos {len(years)} años de {pandas_df.columns.values[0]}',fontsize=15)
+    plt.title(f'Serie de tiempo de últimos {len(years)} años de {pandas_df.columns.values[0]}',fontsize=15)
     plt.subplots_adjust(bottom= 0.2, top = 0.98)
-    plt.xlabel('Mes',fontsize='13')
-    plt.ylim((min,max))
-    plt.grid()
+    plt.xlabel('Fecha',fontsize='13')
+    plt.tight_layout()
     plt.show()
 
 
@@ -298,7 +278,11 @@ if __name__ == '__main__':
 
     # Flujos
     ipc_nacional, ipc_nucleo = get_information(ipc,4).loc['2017':'2020',:], get_information(ipc, 7).loc['2017':'2020',:]
-    tcrm_plot = get_information(tcrm, 0).loc['2017':'2020',:]
+    tcrm_plot = get_information(tcrm, 0)
+    emae_plot = get_information(emae,1)
+    industria_plot = get_information(industria,0)
+    construccion_plot = get_information(construccion,0)
+    recaudacion_plot = get_information(recaudacion,0)
 
 
     ## Testing Bar Plots
@@ -315,8 +299,12 @@ if __name__ == '__main__':
     plot_comparative_bars(reservas_to_plot)
     plot_comparative_bars(deficit_to_plot)
     # Flujo
-    plot_comparative_lines(ipc_nacional)
-    plot_comparative_lines(tcrm_plot)
+    line_plot(ipc_nacional)
+    line_plot(tcrm_plot)
+    line_plot(emae_plot)
+    line_plot(industria_plot)
+    line_plot(construccion_plot)
+    line_plot(recaudacion_plot)
 
 
     # Testing RGBA colors
