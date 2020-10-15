@@ -74,6 +74,7 @@ def plot_comparative_bars(pandas_df):
         y_values.append(y_values_sample)
 
     # Create Figure
+    img = plt.imread('criteria.png')
     fig, ax = plt.subplots(figsize=(18,10))
     color_bars, bar_width = 0.1, 0.8
     colors = ['steelblue', 'green','peru','salmon','gray']
@@ -112,6 +113,7 @@ def plot_comparative_bars(pandas_df):
     ax.set_yticklabels(y_ticks, fontsize='13')
 
     # Setting labels and preview
+    #ax.imshow(img)
     plt.title(f'Comparativa de valores correspondientes a los últimos {len(years)} años de {pandas_df.columns.values[0]}',fontsize=15)
     plt.subplots_adjust(bottom= 0.2, top = 0.98)
     plt.xlabel('Mes',fontsize='13')
