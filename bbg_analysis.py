@@ -46,7 +46,7 @@ def bar_plot(df, title, datos_de_panel=True):
         labels = [x for x in df.columns.values]
         # Create figure
         fig,ax = plt.subplots(figsize=(12,8))
-        plt.bar(x_vals, y_vals, edgecolor='red', label=date)
+        plt.bar(x_vals, y_vals, edgecolor='red', label=date, color='steelblue')
         ax.set_xticks(x_vals)
         ax.set_xticklabels(labels, fontsize='13', rotation=90)
         plt.legend(loc='best', fontsize='13')
@@ -86,6 +86,7 @@ saldo_cf = public_accounts.loc["2018":'2020','Saldo Cuenta Financiera'].reset_in
 line_plot(saldo_cc)
 line_plot(saldo_ca)
 line_plot(saldo_cf)
+
 """ GDP  """
 gdp_sector = sheets_dict['gdp_sector']
 gdp_labels = ['Agro y Ganando', 'Pesca', 'Mineria', 'Manufactura', 'Energía, Gas y Agua', 'Construcción', 'Ventas Retail y Mayoristas',
@@ -97,5 +98,8 @@ for i in range(len(gdp_sector.columns.values)):
 
 last_values = gdp_sector.loc['2020-06']
 test_values = gdp_sector.loc['2019-06']
+int_fin = gdp_sector.loc['2019':'2020','Intermediación Financiera'].reset_index().set_index('index')
 # Plot bars
-bar_plot(test_values, 'PBI por sector', True)
+bar_plot(test_values, 'PBI por sector', datos_de_panel=True)
+bar_plot(last_values, 'PBI por sector', datos_de_panel=True)
+bar_plot(int_fin, 'PBI por sector', datos_de_panel=False)
