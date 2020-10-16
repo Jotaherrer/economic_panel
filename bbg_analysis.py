@@ -1,5 +1,6 @@
 import pandas as pd
 import openpyxl as xl
+import datetime as dt
 import matplotlib.pyplot as plt
 from series_hacienda import line_plot, plot_comparative_bars
 
@@ -22,6 +23,35 @@ cols_money = df_money_base.columns.values
 base_total = df_money_base.loc['2019':'2020',cols_money[2]].reset_index().dropna().set_index('index')
 line_plot(base_total)
 
+# Sample Bar Plot
+def bar_plot(df, title, datos_de_panel=True):
+    """
+    Returns sample bar plot. Pass a dataframe with dates in the index
+    """
+    if datos_de_panel == False:
+        # Set date
+        year, month, day = df.index.year.values[0], df.index.month.values[0], df.index.day.values[0]
+        # Set y values
+        try:
+            # Flatten if numpy array
+            y_vals = df.values.flatten('F')
+        except:
+            # Extract values
+            y_vals = df.values
+        # Set x values
+        x_vals = range(len(y_vals))
+        #
+        labels = [x for x in df.columns.values]
+        # Create figure
+        fig,ax = plt.subplots(figsize=(12,8))
+        plt.bar(x_vals, y_vals, label=labels, edgecolor='red')
+        plt.title(title)
+        plt.legend(loc='best')
+        plt.show()
+    else:
+        pass
+
+
 """ Trade balance """
 trade_balance = sheets_dict['trade balance']
 trade_balance_cols = trade_balance.columns.values
@@ -39,7 +69,7 @@ plot_comparative_bars(saldo_comercial)
 
 """ Public Accounts """
 public_accounts = sheets_dict['public accounts']
-public_accounts.rename(columns={public_accounts.columns.values[0]: 'Saldo Cuenta Corriente',
+public_accounts.rename(columns={public_accounts.columns.values[0]:'Saldo Cuenta Corriente',
                                 public_accounts.columns.values[1]:'Saldo Cuenta Financiera',
                                 public_accounts.columns.values[2]:'Saldo Cuenta Capital',
                                 public_accounts.columns.values[3]:'Saldo Error'},inplace=True)
@@ -57,5 +87,11 @@ gdp_sector = sheets_dict['gdp_sector']
 gdp_labels = ['Agro y Ganando', 'Pesca', 'Mineria', 'Manufactura', 'Energía, Gas y Agua', 'Construcción', 'Ventas Retail y Mayoristas',
               'Hoteles y Restaurantes', 'Transporte y Descarga', 'Intermediación Financiera', 'Real Estate', 'Admin. Pública',
               'Educación', 'Salud', 'Otros', "Servicio Doméstico"]
+
 for i in range(len(gdp_sector.columns.values)):
     gdp_sector.rename(columns={gdp_sector.columns.values[i]:gdp_labels[i]},inplace=True)
+
+last_values = gdp_sector.loc['2020-06']
+test_values = gdp_sector.loc['2019-06']
+# Plot bars
+bar_plot(test_values, 'PBI por sector', False)
