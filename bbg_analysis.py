@@ -28,9 +28,11 @@ def bar_plot(df, title, datos_de_panel=True):
     """
     Returns sample bar plot. Pass a dataframe with dates in the index
     """
-    if datos_de_panel == False:
+    if datos_de_panel == True:
         # Set date
         year, month, day = df.index.year.values[0], df.index.month.values[0], df.index.day.values[0]
+        date = dt.datetime(year,month,day)
+        date = date.strftime('%d-%m-%Y')
         # Set y values
         try:
             # Flatten if numpy array
@@ -44,9 +46,11 @@ def bar_plot(df, title, datos_de_panel=True):
         labels = [x for x in df.columns.values]
         # Create figure
         fig,ax = plt.subplots(figsize=(12,8))
-        plt.bar(x_vals, y_vals, label=labels, edgecolor='red')
-        plt.title(title)
-        plt.legend(loc='best')
+        plt.bar(x_vals, y_vals, edgecolor='red', label=date)
+        ax.set_xticks(x_vals)
+        ax.set_xticklabels(labels, fontsize='13', rotation=90)
+        plt.legend(loc='best', fontsize='13')
+        plt.title(title, fontsize='13')
         plt.show()
     else:
         pass
@@ -94,4 +98,4 @@ for i in range(len(gdp_sector.columns.values)):
 last_values = gdp_sector.loc['2020-06']
 test_values = gdp_sector.loc['2019-06']
 # Plot bars
-bar_plot(test_values, 'PBI por sector', False)
+bar_plot(test_values, 'PBI por sector', True)
