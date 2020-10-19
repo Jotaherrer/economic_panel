@@ -14,17 +14,21 @@ def clean_df(dataframe):
     return dataframe_mod
 
 
-def send_excel(df, sheet_name):
+def excel_prueba(df, df_origin):
     """
-    Export BBG modified data to Excel.
+    Export BBG modified data to Excel. Params:
+    - df: dictionary with modified data from BBG.
+    - df_origin: original excel file with data from BBG.
     """
-    if os.path.exists('bbg_powerbi.xlsx'):
-        wb = xw.Book('bbg_powerbi.xlsx')
-        ws = wb.sheets(sheet_name)
-        ws.range('A1').expand().value = df
-        print('Carga exitosa de datos!')
+    for k,v in info.items():
+        sheet = df_origin.sheet_names[k]
+        if os.path.exists('prueba.xlsx'):
+            wb = xw.Book('prueba.xlsx')
+            ws = wb.sheets(sheet)
+            ws.range('A1').expand().value = df[k]
+            print('Carga exitosa de datos sheet', sheet, '!')
     else:
-        print('Error in excel opening')
+        print('Job Finished!')
 
 
 if __name__ == '__main__':
@@ -122,8 +126,8 @@ if __name__ == '__main__':
             else:
                 print('primer linea no posee errores')
 
-            # Export to excel
-            #send_excel(d, data.sheet_names[i])
-
             i += leng
             n += 1
+
+        # Export modified data to excel
+        excel_prueba(info, data)
