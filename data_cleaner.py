@@ -6,6 +6,7 @@ import numpy as np
 # Define Functions
 def clean_df(dataframe):
     """
+    Filter dataframes extracted from BBG.
     """
     len_cols, cols = len(dataframe.columns), dataframe.columns
     selection = [cols[i] for i in range(len_cols) if ~i % 2]
@@ -13,7 +14,10 @@ def clean_df(dataframe):
     return dataframe_mod
 
 
-def to_excel(df, sheet_name):
+def send_excel(df, sheet_name):
+    """
+    Export BBG modified data to Excel.
+    """
     if os.path.exists('bbg_powerbi.xlsx'):
         wb = xw.Book('bbg_powerbi.xlsx')
         ws = wb.sheets(sheet_name)
@@ -119,7 +123,7 @@ if __name__ == '__main__':
                 print('primer linea no posee errores')
 
             # Export to excel
-            to_excel(d, data.sheet_names[i])
+            #send_excel(d, data.sheet_names[i])
 
             i += leng
             n += 1
