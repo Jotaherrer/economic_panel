@@ -5,6 +5,8 @@ from pdfminer.converter import TextConverter
 from io import StringIO
 from pdfminer.pdfpage import PDFPage
 
+import calendar
+
 
 # Create function to read PDF files (EMAE)
 def get_pdf_file_content(path_to_pdf):
@@ -28,6 +30,41 @@ def get_pdf_file_content(path_to_pdf):
 
     return text
 
+
+def get_filtered_data(data_indec, month_start, month_end, semester):
+    """
+    """
+    dias = ['LU', 'MA', 'MI', 'JU', 'VI']
+    meses_1 = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio']
+    meses_2 = ['Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+
+    if semester == 2:
+        for m in meses_2:
+            if m == 'Julio':
+                mes_inicio = data_indec.find(m)
+                mes_fin = data_indec.find(meses_2[1])
+            elif m == 'Agosto':
+                mes_inicio = data_indec.find(m)
+                mes_fin = data_indec.find(meses_2[2])
+            elif m == 'Septiembre':
+                mes_inicio = data_indec.find(m)
+                mes_fin = data_indec.find(meses_2[3])
+            elif m == 'Octubre':
+                mes_inicio = data_indec.find(m)
+                mes_fin = data_indec.find(meses_2[1])
+
+
+
+
+    elif semester == 1:
+        for m in meses_1:
+            #TODO
+
+    elif semester is not type(int):
+        print('Pasa un número de semestre en formato numérico')
+
+
+
 if __name__ == '__main__':
 
     archivo = './emae_09_2036477D631A.pdf'
@@ -40,3 +77,16 @@ if __name__ == '__main__':
     # Resumen destacado
     data.find('Durante julio, el Estimador')
     print(data[4573:5890])
+
+
+    archivo2 = './calendario_indec_2020_2.pdf'
+    data2 = get_pdf_file_content(archivo2)
+    julio = data2.find('Julio')
+    agosto = data2.find('Agosto')
+    septiembre = data2.find('Septiembre')
+    octubre = data2.find('Octubre')
+    noviembre = data2.find('Noviembre')
+    eventos = data2[octubre:noviembre]
+    print(eventos)
+
+    get_filtered_data(data2, 'Julio', 'Agosto', 2)
