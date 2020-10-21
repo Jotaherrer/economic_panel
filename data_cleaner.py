@@ -11,6 +11,7 @@ def clean_df(dataframe):
     len_cols, cols = len(dataframe.columns), dataframe.columns
     selection = [cols[i] for i in range(len_cols) if ~i % 2]
     dataframe_mod = dataframe.loc[:, [x for x in selection]]
+    dataframe_mod['year'], dataframe_mod['month'], dataframe_mod['day'] = dataframe_mod.index.year, dataframe_mod.index.month, dataframe_mod.index.day
     return dataframe_mod
 
 
