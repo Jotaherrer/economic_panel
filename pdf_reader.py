@@ -31,7 +31,7 @@ def get_pdf_file_content(path_to_pdf):
     return text
 
 
-def get_filtered_data(data_indec, month_start, month_end, semester):
+def get_filtered_data(data_indec, month_start, semester):
     """
     """
     dias = ['LU', 'MA', 'MI', 'JU', 'VI']
@@ -40,28 +40,52 @@ def get_filtered_data(data_indec, month_start, month_end, semester):
 
     if semester == 2:
         for m in meses_2:
-            if m == 'Julio':
-                mes_inicio = data_indec.find(m)
+            if month_start == 'Julio':
+                mes_inicio = data_indec.find(month_start)
                 mes_fin = data_indec.find(meses_2[1])
-            elif m == 'Agosto':
-                mes_inicio = data_indec.find(m)
+            elif month_start == 'Agosto':
+                mes_inicio = data_indec.find(month_start)
                 mes_fin = data_indec.find(meses_2[2])
-            elif m == 'Septiembre':
-                mes_inicio = data_indec.find(m)
+            elif month_start == 'Septiembre':
+                mes_inicio = data_indec.find(month_start)
                 mes_fin = data_indec.find(meses_2[3])
-            elif m == 'Octubre':
-                mes_inicio = data_indec.find(m)
-                mes_fin = data_indec.find(meses_2[1])
-
-
+            elif month_start == 'Octubre':
+                mes_inicio = data_indec.find(month_start)
+                mes_fin = data_indec.find(meses_2[4])
+            elif month_start == 'Noviembre':
+                mes_inicio = data_indec.find(month_start)
+                mes_fin = data_indec.find(meses_2[5])
+            elif month_start == 'Diciembre':
+                mes_inicio = data_indec.find(month_start)
+        info = data_indec[mes_inicio:mes_fin]
 
 
     elif semester == 1:
         for m in meses_1:
-            #TODO
+            if month_start == 'Enero':
+                mes_inicio = data_indec.find(month_start)
+                mes_fin = data_indec.find(meses_1[1])
+            elif month_start == 'Febrero':
+                mes_inicio = data_indec.find(month_start)
+                mes_fin = data_indec.find(meses_1[2])
+            elif month_start == 'Marzo':
+                mes_inicio = data_indec.find(month_start)
+                mes_fin = data_indec.find(meses_1[3])
+            elif month_start == 'Abril':
+                mes_inicio = data_indec.find(month_start)
+                mes_fin = data_indec.find(meses_1[4])
+            elif month_start == 'Mayo':
+                mes_inicio = data_indec.find(month_start)
+                mes_fin = data_indec.find(meses_1[5])
+            elif month_start == 'Junio':
+                mes_inicio = data_indec.find(month_start)
+        info = data_indec[mes_inicio:mes_fin]
 
     elif semester is not type(int):
         print('Pasa un número de semestre en formato numérico')
+
+
+    return info
 
 
 
@@ -81,12 +105,8 @@ if __name__ == '__main__':
 
     archivo2 = './calendario_indec_2020_2.pdf'
     data2 = get_pdf_file_content(archivo2)
-    julio = data2.find('Julio')
-    agosto = data2.find('Agosto')
-    septiembre = data2.find('Septiembre')
-    octubre = data2.find('Octubre')
-    noviembre = data2.find('Noviembre')
-    eventos = data2[octubre:noviembre]
-    print(eventos)
 
-    get_filtered_data(data2, 'Julio', 'Agosto', 2)
+    get_filtered_data(data2, 'Julio', 2)
+    get_filtered_data(data2, 'Agosto', 2)
+
+    julio = get_filtered_data(data2, 'Julio', 2)
