@@ -11,7 +11,7 @@ def clean_df(dataframe):
     len_cols, cols = len(dataframe.columns), dataframe.columns
     selection = [cols[i] for i in range(len_cols) if ~i % 2]
     dataframe_mod = dataframe.loc[:, [x for x in selection]]
-    dataframe_mod['year'], dataframe_mod['month'], dataframe_mod['day'] = dataframe_mod.index.year, dataframe_mod.index.month, dataframe_mod.index.day
+    #dataframe_mod['year'], dataframe_mod['month'], dataframe_mod['day'] = dataframe_mod.index.year, dataframe_mod.index.month, dataframe_mod.index.day
     return dataframe_mod
 
 
@@ -39,50 +39,57 @@ if __name__ == '__main__':
 
         # Tickers identification
         bbg_tickers = {'anual': {'ARGQPYYX INDEX':'pbi_anual'},
-                    'cuatrimestral': {'ARBPCURR Index': 'cuenta_corriente',
-                                        'ARB6FINA Index': 'cuenta_financiera',
-                                        'ARB6CAPI Index': 'cuenta_capital',
-                                        'ARB6ERRO Index': 'cuenta_error',
-                                        'ARPDTOTL Index': 'deuda_total_gobierno',
-                                        'ARGQPYOX Index': 'pbi_consolidad_yoy',
-                                        'ARSQPRIY Index': 'pbi_consumo_privado_yoy',
-                                        'ARSQPUYY Index': 'pbi_gasto_gobierno_yoy',
-                                        'ARSQFIVY Index': 'pbi_construccion_yoy',
-                                        'ARGQGYOX Index': 'pbi_agro_yoy',
-                                        'ARGQIYOX Index': 'pbi_pesca_yoy',
-                                        'ARGQYNOX Index': 'pbi_mineria_yoy',
-                                        'ARGQMYOX Index': 'pbi_manufactura_yoy',
-                                        'ARGQUYOX Index': 'pbi_electricidad_yoy',
-                                        'ARGQCYOX Index': 'pbi_construccion_yoy',
-                                        'ARGQRYOX INDEX': 'pbi_wholesale_retail_yoy',
-                                        'ARGQHYOX Index': 'pbi_hoteles_yoy',
-                                        'ARGQTYOX Index': 'pbi_transporte_yoy',
-                                        'ARGQFYOX Index': 'pbi_interm_fin_yoy',
-                                        'ARGQBYOX Index': 'pbi_real_estate_yoy',
-                                        'ARGQDYOX Index': 'pbi_admin_publica_yoy',
-                                        'ARGQEYOX Index': 'pbi_educacion_yoy',
-                                        'ARGQGOOY Index': 'pbi_salud_yoy',
-                                        'ARGQOTHY Index': 'pbi_otros_yoy',
-                                        'ARGQDOMY Index': 'pbi_pers_domes_yoy',
-                                        'ARUERATE Index': 'desempleo',
-                                        'ARUEEMPL Index': 'empleo'},
+                    'cuatrimestral': {'ARBPCURR Index': 'bop_cuenta_corriente',
+                                      'ARB6FINA Index': 'bop_cuenta_financiera',
+                                      'ARB6CAPI Index': 'bop_cuenta_capital',
+                                      'ARB6ERRO Index': 'bop_cuenta_error',
+                                      'ARPDTOTL Index': 'deuda_total_gobierno',
+                                      'ARGQPYOX Index': 'pbi_consolidad_yoy',
+                                      'ARSQPRIY Index': 'pbi_consumo_privado_yoy',
+                                      'ARSQPUYY Index': 'pbi_gasto_gobierno_yoy',
+                                      'ARSQFIVY Index': 'pbi_construccion_yoy',
+                                      'ARGQGYOX Index': 'pbi_agro_yoy',
+                                      'ARGQIYOX Index': 'pbi_pesca_yoy',
+                                      'ARGQYNOX Index': 'pbi_mineria_yoy',
+                                      'ARGQMYOX Index': 'pbi_manufactura_yoy',
+                                      'ARGQUYOX Index': 'pbi_electricidad_yoy',
+                                      'ARGQCYOX Index': 'pbi_construccion_yoy',
+                                      'ARGQRYOX INDEX': 'pbi_wholesale_retail_yoy',
+                                      'ARGQHYOX Index': 'pbi_hoteles_yoy',
+                                      'ARGQTYOX Index': 'pbi_transporte_yoy',
+                                      'ARGQFYOX Index': 'pbi_interm_fin_yoy',
+                                      'ARGQBYOX Index': 'pbi_real_estate_yoy',
+                                      'ARGQDYOX Index': 'pbi_admin_publica_yoy',
+                                      'ARGQEYOX Index': 'pbi_educacion_yoy',
+                                      'ARGQGOOY Index': 'pbi_salud_yoy',
+                                      'ARGQOTHY Index': 'pbi_otros_yoy',
+                                      'ARGQDOMY Index': 'pbi_pers_domes_yoy',
+                                      'ARUERATE Index': 'desempleo',
+                                      'ARUEEMPL Index': 'empleo',
+                                      'ARDSFIRE Index': 'resultado_fciero_menos_priva',
+                                      'ARDSSUMM Index': 'resultado_primario',
+                                      'ARDSREVE Index': 'ingresos_fiscal',
+                                      'ARDSEXPD Index': 'gasto_primario'},
                     'mensual': {'ARBABEXP Index': 'export_mensual',
                                 'ARBABIMP Index': 'import_mensual',
                                 'ARBABAL Index': 'balance_comercial',
-                                'ARBAEYOY Index': 'export_mensual_yoy',
                                 'ARRMCURR Index': 'cc_1',
                                 'ARNMCURR Index': 'cc_2',
                                 'ARNMCPTL Index': 'cc_3',
-                                'ARC6INCM Index': 'ipc_nacional',
-                                'ARC6INDM Index': 'ipc_nucleo',
+                                'ARNCNINX Index': 'ipc_nacional',
                                 'ARIPNSYO Index': 'act_industrial_yoy',
                                 'ARICGEN Index': 'capacidad_instalada',
                                 'ARSCYOY Index': 'ventas_retail',
-                                    'ARCCIND Index': 'confianza_consumidor',
-                                    'ARTXTOTL Index': 'recaudacion',
-                                    'ARFBFIRS Index': 'inversion_extr_dir',
-                                    'ARVSARTL Index': 'patentamientos',
-                                    'ARVHTOTL Index': 'produccion_autos'},
+                                'ARCCIND Index': 'confianza_consumidor',
+                                'ARTXTOTL Index': 'recaudacion',
+                                'ARFBFIRS Index': 'inversion_extr_dir',
+                                'ARVSARTL Index': 'patentamientos',
+                                'ARVHTOTL Index': 'produccion_autos',
+                                'ARDMSUMM Index': 'resultado_primario',
+                                'ARDMFIRE IndeX': 'resultado_fciero_menos_priva',
+                                'ARCMTOTL Index': 'despachos_cemento',
+                                'AREMORMO Index': 'emae_mensual_yoy',
+                                'AREMDEMO Index': 'emae_mensual_mom'},
                     'diario': {'ARVAM1PY Index': 'm1_yoy',
                                 'ARVAM2PY Index': 'm2_yoy',
                                 'ARVAM3PY Index': 'm3_yoy',
@@ -107,7 +114,7 @@ if __name__ == '__main__':
             df = clean_df(df)
             info[i] = df
 
-        # Data cleaning 2 + export to excel
+        # Data cleaning 2
         i = 0
         n = 1
         for d in info.values():
@@ -126,6 +133,8 @@ if __name__ == '__main__':
                 print('ok drop first row in file', n)
             else:
                 print('primer linea no posee errores')
+
+            d['year'], d['month'], d['day'] = d.index.year, d.index.month, d.index.day
 
             i += leng
             n += 1
