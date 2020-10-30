@@ -100,7 +100,16 @@ if __name__ == '__main__':
                                 'ARDRPESO Index': 'duration_depositos_ars',
                                 'ARDRT30U Index': 'duration_depositos_usd_30_dias',
                                 'ARDRT90U Index': 'duration_depositos_usd_90_dias',
-                                'ARRVIRFS Index': 'reservas_brutas'}}
+                                'ARRVIRFS Index': 'reservas_brutas',
+                                'CRB CMDT Index': 'crb_commodities',
+                                'CRB RIND Index': 'crb_raw_industrials',
+                                'SPGSCITR Index': 'daily_',
+                                'SPGSAGTR Index': 'daily_agro',
+                                'S 1 COMDTY': 'daily_soybean',
+                                'SPX Index': 'daily_spx',
+                                'VIX Index': 'daily_vix',
+                                'XAU CURNCY': 'daily_gold',
+                                'CL1 COMDTY': 'daily_oil'}}
 
         tickers_list = []
         for period, tickers in bbg_tickers.items():
