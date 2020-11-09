@@ -11,11 +11,10 @@ def clean_df(dataframe):
     len_cols, cols = len(dataframe.columns), dataframe.columns
     selection = [cols[i] for i in range(len_cols) if ~i % 2]
     dataframe_mod = dataframe.loc[:, [x for x in selection]]
-    #dataframe_mod['year'], dataframe_mod['month'], dataframe_mod['day'] = dataframe_mod.index.year, dataframe_mod.index.month, dataframe_mod.index.day
     return dataframe_mod
 
 
-def excel_prueba(df, df_origin):
+def excel_prueba(df, df_origin, metricas_powerbi = False):
     """
     Export BBG modified data to Excel. Params:
     - df: dictionary with modified data from BBG.
@@ -23,11 +22,16 @@ def excel_prueba(df, df_origin):
     """
     for k,v in info.items():
         sheet = df_origin.sheet_names[k]
-        if os.path.exists('prueba.xlsx'):
-            wb = xw.Book('prueba.xlsx')
+        if (os.path.exists('datos_powerbi.xlsx')) & (metricas_powerbi == False):
+            wb = xw.Book('datos_powerbi.xlsx')
             ws = wb.sheets(sheet)
             ws.range('A1').expand().value = df[k]
-            print('Carga exitosa de datos sheet', sheet, '!')
+            print('Carga exitosa de datos sheet', sheet, 'en el archivo datos_powerbi','!')
+        elif (os.path.exists('datos_medidas.xlsx')) & (metricas_powerbi == True):
+            wb = xw.Book('datos_medidas.xlsx')
+            ws = wb.sheets(sheet)
+            ws.range('A1').expand().value = df[k]
+            print('Carga exitosa de datos sheet', sheet, 'en el archivo datos_medidas', '!')
     else:
         print('Job Finished!')
 
@@ -83,9 +87,7 @@ if __name__ == '__main__':
                                 'ARCOMOM Index': 'constr_mom',
                                 'ARCOTRND Index': 'trend_constr',
                                 'ARCOTRNM Index': 'trend_constr_mom',
-                                'ARICGEN Index': 'capacidad_instalada',
                                 'ARSCYOY Index': 'ventas_retail',
-                                'ARCCIND Index': 'confianza_consumidor',
                                 'ARTXTOTL Index': 'recaudacion',
                                 'ARFBFIRS Index': 'inversion_extr_dir',
                                 'ARVSARTL Index': 'patentamientos',
@@ -165,10 +167,11 @@ if __name__ == '__main__':
             else:
                 print('primer linea no posee errores')
 
-            d['year'], d['month'], d['day'] = d.index.year, d.index.month, d.index.day
+            # Add year, month and day numbers (Optional)
+            # d['year'], d['month'], d['day'] = d.index.year, d.index.month, d.index.day
 
             i += leng
             n += 1
 
         # Export modified data to excel
-        excel_prueba(info, data)
+        excel_prueba(info, data, False)
