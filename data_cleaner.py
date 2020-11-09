@@ -81,6 +81,8 @@ if __name__ == '__main__':
                                 'ARCOYOY Index': 'constr_mom_año_anterior',
                                 'ARCONNAC Index': 'isac_general_no_estac',
                                 'ARCOMOM Index': 'constr_mom',
+                                'ARCOTRND Index': 'trend_constr',
+                                'ARCOTRNM Index': 'trend_constr_mom',
                                 'ARICGEN Index': 'capacidad_instalada',
                                 'ARSCYOY Index': 'ventas_retail',
                                 'ARCCIND Index': 'confianza_consumidor',
@@ -110,9 +112,25 @@ if __name__ == '__main__':
                                 'SPGSAGTR Index': 'daily_agro',
                                 'S 1 COMDTY': 'daily_soybean',
                                 'SPX Index': 'daily_spx',
+                                'DIA US Equity': 'daily_dji',
                                 'VIX Index': 'daily_vix',
                                 'XAU CURNCY': 'daily_gold',
-                                'CL1 COMDTY': 'daily_oil'}}
+                                'CL1 COMDTY': 'daily_oil',
+                                'XLE US Equity': '',
+                                'XLF US Equity': '',
+                                'XLI US Equity': '',
+                                'XLK US Equity': '',
+                                'XLV US Equity': '',
+                                'XLY US Equity': '',
+                                'XLP US Equity': '',
+                                'XLU US Equity': '',
+                                'MERVAL': 'daily_merval',
+                                'GGAL': 'daily_galicia',
+                                'BBAR': 'daily_bbva',
+                                'BMA': 'daily_macro',
+                                'CEPU': 'daily_cepu',
+                                'PAM': 'daily_pam',
+                                'YPF': 'daily_ypf'}}
 
         tickers_list = []
         for period, tickers in bbg_tickers.items():
