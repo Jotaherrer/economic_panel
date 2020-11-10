@@ -27,8 +27,8 @@ def excel_prueba(df, df_origin, metricas_powerbi = False):
             ws = wb.sheets(sheet)
             ws.range('A1').expand().value = df[k]
             print('Carga exitosa de datos sheet', sheet, 'en el archivo datos_powerbi','!')
-        elif (os.path.exists('datos_medidas.xlsx')) & (metricas_powerbi == True):
-            wb = xw.Book('datos_medidas.xlsx')
+        elif (os.path.exists('Panel Económico.xlsx')) & (metricas_powerbi == True):
+            wb = xw.Book('Panel Económico.xlsx')
             ws = wb.sheets(sheet)
             ws.range('A1').expand().value = df[k]
             print('Carga exitosa de datos sheet', sheet, 'en el archivo datos_medidas', '!')
@@ -174,4 +174,4 @@ if __name__ == '__main__':
             n += 1
 
         # Export modified data to excel
-        excel_prueba(info, data, False)
+        excel_prueba(info, data, True)
