@@ -35,10 +35,13 @@ def excel_prueba(df, df_origin, metricas_powerbi = False):
     else:
         print('Job Finished!')
 
-
 if __name__ == '__main__':
         # Data import
-        data = pd.ExcelFile('./demo bbg2.xlsx')
+        archivos = os.listdir()
+        for a in archivos:
+            if a.endswith('xlsx') & a.startswith('demo bbg2'):
+                archivo_to_look = a
+        data = pd.ExcelFile(archivo_to_look, engine='openpyxl')
         #data.sheet_names
 
         # Tickers identification
@@ -147,6 +150,7 @@ if __name__ == '__main__':
             df = clean_df(df)
             info[i] = df
 
+
         # Data cleaning 2
         i = 0
         n = 1
@@ -174,4 +178,4 @@ if __name__ == '__main__':
             n += 1
 
         # Export modified data to excel
-        excel_prueba(info, data, True)
+        excel_prueba(info, data, False)
