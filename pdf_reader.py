@@ -31,22 +31,62 @@ def get_pdf_file_content(path_to_pdf):
 
 if __name__ == '__main__':
 
-    archivo = './emae_09_2036477D631A.pdf'
-    directory = os.listdir()
-    data = get_pdf_file_content(archivo)
+    archivo = './MISHA INT Statements año 2020.pdf'
+    pdf_info = open(archivo, 'rb')
+    info = p.PdfFileReader(pdf_info)
+    info.isEncrypted
+    info.decrypt('1')
 
-    # Busca cuadros con actividad economica
-    data.find('Cuadro 1.')
-    print(data[1002:1300])
-    # Resumen destacado
-    data.find('Durante julio, el Estimador')
-    print(data[4573:5890])
+    for i in range(100000000):
+        try:
+            result = info.decrypt(str(i))
+            if result == 1:
+                break
+        except:
+            if i % 1000000 == 0:
+                print('Decryption failed with password ',i)
+            continue
+
+    import string, random
+
+    minimum = 1
+    maximum = 10
+    wmaximum = 1000000
+    alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYX0123456789'
+    alphabet = alphabet[:52] + string.digits + string.punctuation
+
+    test_file = open('wl.txt', 'w')
+    texto = ''
+    for w in range(wmaximum):
+        for x in random.sample(alphabet, random.randint(minimum, maximum)):
+            texto += x
+        test_file.write(texto+'\n')
+        print(texto)
+        texto = ''
+    test_file.close()
 
 
-    archivo2 = './calendario_indec_2020_2.pdf'
-    data2 = get_pdf_file_content(archivo2)
 
-    get_filtered_data(data2, 'Julio', 2)
-    get_filtered_data(data2, 'Agosto', 2)
+    test_file2 = open('wl.txt', 'r')
+    for i, l in enumerate(test_file2.readlines()):
+        passw = l.strip()
+        try:
+            result = info.decrypt(passw)
+            if result == 1:
+                print('Success with word:',passw)
+                break
+        except:
+            if i % 10000 == 0:
+                print('Decryption failed with pass', passw)
+    test_file2.close()
 
-    julio = get_filtered_data(data2, 'Julio', 2)
+    import requests, bs4
+
+    res = requests.get('https://www.ef.com/wwen/english-resources/english-vocabulary/top-3000-words/')
+    soup = bs4.BeautifulSoup(res.text, 'lxml')
+    data = soup.select('p')
+    for w in data:
+        print(len(w))
+    data[-1]
+    words = data[-1].text.split()
+    print(type(words))
